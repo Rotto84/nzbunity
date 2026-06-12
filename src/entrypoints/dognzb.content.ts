@@ -43,6 +43,34 @@ class DognzbContent extends Content {
   }
 
   async ready() {
+// Only apply CSS fix in Chrome — Firefox handles CSP differently and shows the icon fine
+const isChrome = navigator.userAgent.includes('Chrome') && !navigator.userAgent.includes('Firefox');
+
+if (isChrome) {
+  const style = document.createElement('style');
+  style.textContent = `
+    .NZBUnityLink {
+      background-image: none !important;
+      min-width: 16px !important;
+      border-radius: 2px !important;
+      background-color: #40a040 !important;
+      color: white !important;
+      font-size: 13px !important;
+      font-weight: bold !important;
+      text-align: center !important;
+      line-height: 16px !important;
+      text-decoration: none !important;
+    }
+    .NZBUnityLink::before {
+      content: '↓' !important;
+    }
+    .NZBUnityLink.pending { background-color: #808080 !important; }
+    .NZBUnityLink.success { background-color: #40a040 !important; }
+    .NZBUnityLink.error   { background-color: #cc3333 !important; }
+  `;
+  document.head.appendChild(style);
+}
+    
     this.observer = new MutationObserver((mutations) => {
       console.info(`[NZB Unity] Content changed, updating links...`);
       this.onReady(); // Re-run initialization
